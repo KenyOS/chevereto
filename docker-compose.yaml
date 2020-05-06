@@ -1,0 +1,52 @@
+version: '2.1'
+services:
+    mysql-chevereto:
+      container_name: chevereto-mysql
+      image: mariadb:10.2
+      restart: always
+      volumes:
+        - mysql-vol-1:/var/lib/mysql/
+      environment:
+        # change timezone of yours and other values
+        - TZ=America/Sao_Paulo
+        - MYSQL_ROOT_PASSWORD=!ch3v3r3t0
+        - MYSQL_DATABASE=chevereto
+        - MYSQL_USER=chevereto
+        - MYSQL_PASSWORD=chevereto
+      networks:
+        chevereto-network:
+          # change ip address of yours
+          ipv4_address: 172.17.0.4
+          aliases:
+            - mysql
+
+    web-chevereto:
+      container_name: chevereto-web
+      image: zaywalker/chevereto:installer
+      restart: always
+      depends_on:
+        - mysql-chevereto
+      volumes:
+        # change mount point of yours
+        - /Images:/var/www/html
+      environment:
+        # change timezone of yours
+        - TZ=America/Sao_Paulo
+      networks:
+        chevereto-network:
+          # change ip address of yours
+          ipv4_address: 172.17.0.4
+          aliases:
+            - web
+
+volumes:
+  mysql-vol-1:
+
+networks:
+  chevereto-network:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        # change subnet of yours
+        - subnet: 172.17.0.0/16
